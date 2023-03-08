@@ -1,5 +1,6 @@
 const express = require("express");
-const { listContacts } = require("../../models/contacts");
+const { listContacts, getContactById } = require("../../models/contacts");
+const { nanoid } = require("nanoid");
 
 const router = express.Router();
 
@@ -14,16 +15,44 @@ router.get("/", async (req, res, next) => {
       msg: err.msg,
     });
   }
-
   // res.json({ message: "template message" });
 });
 
 router.get("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  try {
+    const {contactId}= req.params;
+    const contact = await getContactById(contactId);
+
+    res.status(200).json({
+      contact,
+    });
+  } catch (err) {
+    res.status(500).json({
+      msg: err.msg,
+    });
+  }
+
+  // res.json({ message: "template message" });
 });
 
 router.post("/", async (req, res, next) => {
-  res.json({ message: "template message" });
+  try {
+    const contacts = await listContacts();
+
+    const newContact ={
+      id: nanoid(),
+      ...req.body
+    }
+    contacts.push(newContact);
+    res.status(201).json({
+      newContact,
+    });
+  } catch (err) {
+    res.status(500).json({
+      msg: err.msg,
+    });
+  }
+  // res.json({ message: "template message" });
 });
 
 router.delete("/:contactId", async (req, res, next) => {
