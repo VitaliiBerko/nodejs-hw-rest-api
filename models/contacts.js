@@ -29,7 +29,6 @@ const removeContact = async (contactId) => {
     const contacts = await listContacts();
     const newContacts = contacts.filter(({ id }) => id !== contactId);
     await fs.writeFile(contactsPath, JSON.stringify(newContacts));
-    // return newContacts;
   } catch (err) {
     console.error(err.message);
   }
@@ -50,14 +49,16 @@ const updateContact = async (contactId, body) => {
   try {
     const { name, email, phone } = body;
     const contacts = await listContacts();
-    const contactUpdated = contacts.filter(({ id }) => id === contactId);
+    const contactUpdated = contacts.find(({ id }) => id === contactId);
 
     if (name) contactUpdated.name = name;
     if (email) contactUpdated.email = email;
     if (phone) contactUpdated.phone = phone;
-    const contacUpdatedIdx = contacts.findIndex(({ id }) => id === contactId);
-    contacts[contacUpdatedIdx] = contactUpdated;
+
+    const contactIdx = contacts.findIndex((item) => item.id === contactId);
+    contacts[contactIdx] = contactUpdated;
     await fs.writeFile(contactsPath, JSON.stringify(contacts));
+
     return contactUpdated;
   } catch (err) {
     console.error(err.message);

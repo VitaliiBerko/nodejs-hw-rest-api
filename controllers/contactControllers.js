@@ -48,8 +48,8 @@ exports.getAddContactByIdController = async (req, res, next) => {
 
 exports.removeContactController = async (req, res) => {
   try {
-    const { id } = req.params;
-    await removeContact(id);
+    const { contactId } = req.params;
+    await removeContact(contactId);
     res.status(200).json({ message: "contact deleted" });
   } catch (err) {
     res.status(500).json({
@@ -61,9 +61,11 @@ exports.removeContactController = async (req, res) => {
 exports.updateContactController = async (req, res) => {
   try {
     const { body } = req;
-    const { id } = req.params;
-    const contactUpdated = await updateContact(id, body);
-    res.status(200).json(contactUpdated);
+    const { contactId } = req.params;
+    const contactUpdated = await updateContact(contactId, body);
+    console.log("contact ID ->", contactId);
+    console.log("body->", body);
+    res.status(200).send(contactUpdated);
   } catch (err) {
     res.status(500).json({
       msg: err.msg,
