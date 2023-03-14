@@ -37,8 +37,8 @@ const removeContact = async (contactId) => {
 const addContact = async (body) => {
   try {
     const contacts = await listContacts();
-    body.id = nanoid();
-    await fs.writeFile(contactsPath, JSON.stringify([...contacts, body]));
+    // body.id = nanoid();
+    await fs.writeFile(contactsPath, JSON.stringify([...contacts, { id: nanoid(), ...body}]));
     return body;
   } catch (err) {
     console.error(err.message);
