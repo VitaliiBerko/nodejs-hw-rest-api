@@ -1,11 +1,14 @@
-const fs = require("fs").promises;
+// const fs = require("fs").promises;
 const Joi = require("joi");
+const Contact = require("../models/contactModel")
+
 
 exports.checkContactData = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30).required(),
     email: Joi.string().email().required(),
     phone: Joi.string().required(),
+    favorite: Joi.boolean(),
   });
 
   const validationErr = schema.validate(req.body).error;
@@ -24,14 +27,11 @@ exports.checkContactData = (req, res, next) => {
 exports.checkContactId = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const contacts = JSON.parse(await fs.readFile("./models/contacts.json"));
-
-    const contact = contacts.find((item) => item.id === id);
+    const contact = Contact.findById({_id: id});
 
     if (contact) {
       req.contact = contact;
-      return next();
-    }
+      return next();    }
 
     return res.status(404).json({ message: "Not found" });
   } catch (err) {

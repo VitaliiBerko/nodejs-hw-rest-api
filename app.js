@@ -8,6 +8,7 @@ const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
+
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
@@ -19,7 +20,7 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const {status} = err
+  const { status } = err;
   res.status(status || 500).json({ message: err.message });
 });
 
