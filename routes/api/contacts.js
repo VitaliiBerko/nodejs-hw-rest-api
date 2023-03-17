@@ -7,11 +7,13 @@ const {
   removeContactController,
   updateContactController,
   getAddContactByIdController,
+  updateStatusContactController,
 } = require("../../controllers/contactControllers");
 const {
   checkContactData,
   checkContactId,
   checkContactBody,
+  checkContactStatus,
 } = require("../../middlewares/contactMiddlewares");
 
 const router = express.Router();
@@ -29,6 +31,8 @@ router
   .put(checkContactBody, updateContactController)
   .delete(removeContactController);
 
-
+router
+  .route("/:contactId/favorite")
+  .put(checkContactStatus, updateStatusContactController);
 
 module.exports = router;

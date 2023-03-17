@@ -23,7 +23,6 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    
     return Contact.findByIdAndRemove({ _id: contactId });
   } catch (err) {
     console.error(err.message);
@@ -32,33 +31,30 @@ const removeContact = async (contactId) => {
 
 const addContact = async (body) => {
   try {
-     return Contact.create(body);
+    return Contact.create(body);
   } catch (err) {
     console.error(err.message);
   }
 };
 
 const updateContact = async (contactId, body) => {
-  try {
-    // const { name, email, phone } = body;
-    // const contacts = await listContacts();
-    // const contactUpdated = contacts.find(({ id }) => id === contactId);
-
-    // if (name) contactUpdated.name = name;
-    // if (email) contactUpdated.email = email;
-    // if (phone) contactUpdated.phone = phone;
-
-    // const contactIdx = contacts.findIndex((item) => item.id === contactId);
-    // contacts[contactIdx] = contactUpdated;
-    // await fs.writeFile(contactsPath, JSON.stringify(contacts));
-
-    // return contactUpdated;
-
+  try {    
     return Contact.findByIdAndUpdate({ _id: contactId }, body, { new: true });
   } catch (err) {
     console.error(err.message);
   }
 };
+
+const updateStatusContact = async (contactId, body)=> {
+  try {
+    const {favorite}= body;
+
+ return Contact.findByIdAndUpdate(contactId, {favorite}, {new: true})
+    
+  } catch (err) {
+    console.error(err.message);
+  }
+}
 
 module.exports = {
   listContacts,
@@ -66,4 +62,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact
 };
