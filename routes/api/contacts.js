@@ -32,6 +32,6 @@ router
 
 router
   .route("/:contactId/favorite")
-  .put(checkContactStatus, updateStatusContactController);
+  .patch(checkContactStatus, updateStatusContactController);
 
 module.exports = router;
