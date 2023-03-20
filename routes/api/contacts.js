@@ -1,5 +1,4 @@
 const express = require("express");
-// const { listContacts,} = require("../../models/contacts");
 
 const {
   getListContactsController,
@@ -23,7 +22,7 @@ router
   .get(getListContactsController)
   .post(checkContactData, getAddContactByIdController);
 
-router.use("/:id", checkContactId);
+router.use("/:contactId", checkContactId);
 
 router
   .route("/:contactId")

@@ -1,9 +1,9 @@
 // const fs = require("fs").promises;
 const Joi = require("joi");
-// const Contact = require("../models/contactModel");
 const {
   Types: { ObjectId },
 } = require("mongoose");
+const Contact = require("../models/contactModel");
 
 exports.checkContactData = (req, res, next) => {
   const schema = Joi.object({
@@ -28,13 +28,20 @@ exports.checkContactData = (req, res, next) => {
 
 exports.checkContactId = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { contactId } = req.params;
 
-    if (ObjectId.isValid(id)) {
-      return next();
+    
+    if (!ObjectId.isValid(contactId)) {
+      return res.status(404).json({ message: "Not found" });      
     }
 
-    return res.status(404).json({ message: "Not found" });
+    const userExists = await Contact.exists({_id: contactId})
+
+    if(!userExists) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    next()
+    
   } catch (err) {
     next(err);
   }
