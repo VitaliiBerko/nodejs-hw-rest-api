@@ -4,6 +4,7 @@ const {
   addContact,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../models/contacts");
 
 exports.getListContactsController = async (req, res, next) => {
@@ -63,12 +64,20 @@ exports.updateContactController = async (req, res) => {
     const { body } = req;
     const { contactId } = req.params;
     const contactUpdated = await updateContact(contactId, body);
-    console.log("contact ID ->", contactId);
-    console.log("body->", body);
+
     res.status(200).send(contactUpdated);
   } catch (err) {
     res.status(500).json({
       msg: err.msg,
     });
   }
+};
+
+exports.updateStatusContactController = async (req, res) => {
+  try {
+    const { body } = req;
+    const { contactId } = req.params;
+    const statusContactUpdated = await updateStatusContact(contactId, body);
+    res.status(200).send(statusContactUpdated);
+  } catch (error) {}
 };
