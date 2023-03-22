@@ -1,4 +1,5 @@
-const { model, Schema } = require("mongoose");
+
+const { model, Schema, SchemaTypes } = require("mongoose");
 
 const contactSchema = new Schema({
   name: {
@@ -14,6 +15,10 @@ const contactSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'user',
+  }
 });
 
 const Contact = model("Contact", contactSchema);
