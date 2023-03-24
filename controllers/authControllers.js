@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
 exports.registerController = async (req, res) => {
   const { email } = req.body;
@@ -26,7 +26,7 @@ exports.registerController = async (req, res) => {
 
     res.status(201).json({
       user: newUser,
-    //   token,
+      //   token,
     });
   } catch (err) {
     res.status(500).json({
@@ -50,11 +50,38 @@ exports.loginController = async (req, res, next) => {
 
     user.password = undefined;
     const token = signToken(user.id);
+    user.token = token;
+
+    await User.findByIdAndUpdate({ _id: user.id }, user, { new: true });
+    user.token = undefined;
 
     res.status(200).json({
       token,
       user,
     });
+  } catch (err) {
+    res.status(500).json({
+      msg: err.msg,
+    });
+  }
+};
+
+exports.logoutController = async (req, res) => {
+  try {
+    
+    const { _id: id} = req.user;
+    console.log("id->", id);
+
+    const user = await User.findOne({ id });
+
+    // const userExists = await User.exists({_id: id})
+
+    if (!user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    user.token = undefined;
+    return res.status(204);
   } catch (err) {
     res.status(500).json({
       msg: err.msg,

@@ -1,5 +1,5 @@
 const { model, Schema } = require("mongoose");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 const userSchema = new Schema({
   password: {
@@ -15,19 +15,20 @@ const userSchema = new Schema({
     type: String,
     enum: ["starter", "pro", "business"],
     default: "starter",
+    
   },
-  token: {type:String}
+  token: { type: String, select: false }
 });
 
-userSchema.pre('save', async function (next) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt)
+userSchema.pre("save", async function (next) {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 
-    next()
-})
+  next();
+});
 
-userSchema.methods.checkPassword = (candidate, hash) => bcrypt.compare(candidate, hash)
-
+userSchema.methods.checkPassword = (candidate, hash) =>
+  bcrypt.compare(candidate, hash);
 
 const User = model("User", userSchema);
 

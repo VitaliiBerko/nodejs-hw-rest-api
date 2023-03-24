@@ -5,7 +5,7 @@ const {
 } = require("mongoose");
 const Contact = require("../models/contactModel");
 
-exports.checkContactData = (req, res, next) => {
+exports.checkContactData = async (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30).required(),
     email: Joi.string().email().required(),
@@ -22,6 +22,9 @@ exports.checkContactData = (req, res, next) => {
       .status(400)
       .json({ message: `Missing reqiured ${fieldName} field` });
   }
+  const { email } = req.body;
+  const contact = Contact.findOne({ email }).select("-password");
+  if (contact) res.status(400).json({ message: "Email already exists " });
 
   next();
 };
@@ -30,18 +33,16 @@ exports.checkContactId = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
-    
     if (!ObjectId.isValid(contactId)) {
-      return res.status(404).json({ message: "Not found" });      
-    }
-
-    const userExists = await Contact.exists({_id: contactId})
-
-    if(!userExists) {
       return res.status(404).json({ message: "Not found" });
     }
-    next()
-    
+
+    const userExists = await Contact.exists({ _id: contactId });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    next();
   } catch (err) {
     next(err);
   }

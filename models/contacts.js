@@ -30,8 +30,11 @@ const removeContact = async (contactId) => {
 };
 
 const addContact = async (body) => {
-  try {
+  try { 
+
+
     return Contact.create(body);
+    
   } catch (err) {
     console.error(err.message);
   }
