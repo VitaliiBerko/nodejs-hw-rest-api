@@ -32,4 +32,5 @@ userSchema.methods.checkPassword = (candidate, hash) =>
 
 const User = model("User", userSchema);
 
-module.exports = User;
+
+  module.exports = User;

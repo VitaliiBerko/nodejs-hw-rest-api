@@ -1,33 +1,22 @@
-const jwt = require("jsonwebtoken");
-
 const User = require("../models/userModel");
-
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+const { addUser, loginUser, logoutUser } = require("../models/user");
 
 exports.registerController = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(409).json({
-      status: "error",
-      code: 409,
+      // status: "error",
+      // code: 409,
       message: "Email in use",
-      data: "Conflict",
+      // data: "Conflict",
     });
   }
 
   try {
-    const newUserData = { ...req.body };
-    const newUser = await User.create(newUserData);
+    const regUser = await addUser(req.body);
 
-    newUser.password = undefined;
-    // const token = signToken(newUser.id);
-
-    res.status(201).json({
-      user: newUser,
-      //   token,
-    });
+    return res.status(201).json(regUser);
   } catch (err) {
     res.status(500).json({
       msg: err.msg,
@@ -37,27 +26,15 @@ exports.registerController = async (req, res) => {
 
 exports.loginController = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+password");
+     const user = await loginUser(req.body);
+    const { token, email, subscription } = user;
 
-    if (!user)
+    if (!token)
       return res.status(401).json({ message: "Email or password is wrong" });
-
-    const passwordIsValid = await user.checkPassword(password, user.password);
-
-    if (!passwordIsValid)
-      return res.status(401).json({ message: "Email or password is wrong" });
-
-    user.password = undefined;
-    const token = signToken(user.id);
-    user.token = token;
-
-    await User.findByIdAndUpdate({ _id: user.id }, user, { new: true });
-    user.token = undefined;
 
     res.status(200).json({
       token,
-      user,
+      user: { email, subscription },
     });
   } catch (err) {
     res.status(500).json({
@@ -68,23 +45,27 @@ exports.loginController = async (req, res, next) => {
 
 exports.logoutController = async (req, res) => {
   try {
-    
-    const { _id: id} = req.user;
-    console.log("id->", id);
+    const {id } = req.user;
+    // console.log("id->", id);
 
-    const user = await User.findOne({ id });
+    const logedoutUser = await logoutUser(id);
 
     // const userExists = await User.exists({_id: id})
-
-    if (!user) {
+    if (!logedoutUser) {
       return res.status(401).json({ message: "Not authorized" });
     }
-
-    user.token = undefined;
-    return res.status(204);
+    
+    return res.sendStatus(204);
   } catch (err) {
     res.status(500).json({
       msg: err.msg,
     });
   }
 };
+
+exports.currentUserController = (req, res)=> {
+  console.log("123", req.user);
+  const {email, subscription} = req.user;
+  res.status(200).json({email, subscription});
+
+}
