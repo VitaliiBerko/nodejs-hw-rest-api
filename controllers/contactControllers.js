@@ -1,4 +1,3 @@
-
 const {
   listContacts,
   getContactById,
@@ -10,8 +9,8 @@ const {
 
 exports.getListContactsController = async (req, res, next) => {
   try {
-    
-    const {id} = req.user
+    const { id } = req.user;
+
     const contacts = await listContacts(id, req.query);
     res.status(200).json(contacts);
   } catch (err) {
@@ -39,9 +38,9 @@ exports.getContactByIdController = async (req, res, next) => {
 exports.getAddContactByIdController = async (req, res) => {
   try {
     const { body, user } = req;
-      
     const contactAdd = await addContact(body, user);
-
+    // console.log("--->", req.user);
+    // console.log("addContact--->", contactAdd);
     res.status(201).json(contactAdd);
   } catch (err) {
     res.status(500).json({

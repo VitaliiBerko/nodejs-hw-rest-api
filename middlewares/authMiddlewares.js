@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 exports.checkRegisterData = (req, res, next) => {
   const schema = Joi.object({
@@ -16,11 +16,9 @@ exports.checkRegisterData = (req, res, next) => {
     const fieldName = validationErr.details[0].context.key;
     console.log(validationErr.details[0].message);
 
-    return res
-      .status(400)
-      .json({
-        message: `Missing reqiured ${fieldName} field. ${validationErr.details[0].message}`,
-      });
+    return res.status(400).json({
+      message: `Missing reqiured ${fieldName} field. ${validationErr.details[0].message}`,
+    });
   }
 
   next();
@@ -46,15 +44,16 @@ exports.checkLoginData = (req, res, next) => {
   next();
 };
 
-exports.protect = async (req, res, next)=> {
-  const {authorization}= req.headers;
-  const token = authorization?.startsWith("Bearer") && authorization.split(" ")[1]
+exports.protect = async (req, res, next) => {
+  const { authorization } = req.headers;
+  const token =
+    authorization?.startsWith("Bearer") && authorization.split(" ")[1];
 
-  if(!token) return res.status(401).json({message: "Not authorized"})
-  const decodedToken = await jwt.verify(token, process.env.JWT_SECRET)
+  if (!token) return res.status(401).json({ message: "Not authorized" });
+  const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
 
   const currentUser = await User.findById(decodedToken.id);
-  if(!currentUser) return res.status(401).json({message: "Not authorized"})
+  if (!currentUser) return res.status(401).json({ message: "Not authorized" });
   req.user = currentUser;
-  next()
-}
+  next();
+};

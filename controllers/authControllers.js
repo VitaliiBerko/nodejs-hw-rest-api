@@ -26,7 +26,7 @@ exports.registerController = async (req, res) => {
 
 exports.loginController = async (req, res, next) => {
   try {
-     const user = await loginUser(req.body);
+    const user = await loginUser(req.body);
     const { token, email, subscription } = user;
 
     if (!token)
@@ -45,16 +45,13 @@ exports.loginController = async (req, res, next) => {
 
 exports.logoutController = async (req, res) => {
   try {
-    const {id } = req.user;
-    // console.log("id->", id);
-
+    const { id } = req.user;
     const logedoutUser = await logoutUser(id);
 
-    // const userExists = await User.exists({_id: id})
     if (!logedoutUser) {
       return res.status(401).json({ message: "Not authorized" });
     }
-    
+
     return res.sendStatus(204);
   } catch (err) {
     res.status(500).json({
@@ -63,9 +60,8 @@ exports.logoutController = async (req, res) => {
   }
 };
 
-exports.currentUserController = (req, res)=> {
+exports.currentUserController = (req, res) => {
   console.log("123", req.user);
-  const {email, subscription} = req.user;
-  res.status(200).json({email, subscription});
-
-}
+  const { email, subscription } = req.user;
+  res.status(200).json({ email, subscription });
+};

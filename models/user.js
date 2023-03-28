@@ -43,7 +43,7 @@ const loginUser = async (body) => {
 
 const logoutUser = async (id) => {
   try {
-  return  await User.findByIdAndUpdate(id, { token: null }, { new: true });
+    return await User.findByIdAndUpdate(id, { token: null }, { new: true });
   } catch (err) {
     console.error(err.message);
   }

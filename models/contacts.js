@@ -1,29 +1,26 @@
-// const { nanoid } = require("nanoid");
-// const path = require("path");
-// const fs = require("fs").promises;
 const Contact = require("../models/contactModel");
-
-// const contactsPath = path.join(__dirname, "contacts.json");
 
 const listContacts = async (id, query) => {
   try {
-    const { limit, page, favorite } = query;
+    const { limit, page = 1, favorite } = query;
+    console.log("favorite---->", favorite);
 
-    // if (favorite) {
-    //   const findOptions = {$and: [{id}, {favorite}]}
-    // }
+    const findOptions = favorite
+      ? { $and: [{ owner: id }, { favorite }] }
+      : { owner: id };
 
-    const findOptions = favorite ? { $and: [{ id }, { favorite }] } : { id };
     const contactsQuery = Contact.find(findOptions);
 
-    const paginationPage = +page || 1;
-    const paginationLimit = +limit || 5;
-    const skip = (paginationPage - 1) * paginationLimit;
-    contactsQuery.skip(skip).limit(paginationLimit);
+    const skip = (page - 1) * limit;
+    contactsQuery.skip(skip).limit(limit);
 
     const contacts = await contactsQuery.populate("owner");
+    const contactsWithoutPassword = contacts.map((contact) => {
+      contact.owner.password = undefined;
+      return contact;
+    });
 
-    return contacts;
+    return contactsWithoutPassword;
   } catch (err) {
     console.error(err.message);
   }
@@ -46,11 +43,12 @@ const removeContact = async (contactId) => {
 };
 
 const addContact = async (body, user) => {
-  try {    
-      body.owner = user.id  
-    
-    return Contact.create(body);
-    
+  try {
+    body.owner = user;
+
+    const contact = await Contact.create(body);
+   
+    return contact;
   } catch (err) {
     console.error(err.message);
   }

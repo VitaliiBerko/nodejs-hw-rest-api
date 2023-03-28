@@ -15,9 +15,8 @@ const userSchema = new Schema({
     type: String,
     enum: ["starter", "pro", "business"],
     default: "starter",
-    
   },
-  token: { type: String, select: false }
+  token: { type: String, select: false },
 });
 
 userSchema.pre("save", async function (next) {
@@ -30,7 +29,6 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.checkPassword = (candidate, hash) =>
   bcrypt.compare(candidate, hash);
 
-const User = model("User", userSchema);
+const User = model("user", userSchema);
 
-
-  module.exports = User;
+module.exports = User;

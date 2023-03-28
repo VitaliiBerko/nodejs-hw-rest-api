@@ -23,7 +23,8 @@ exports.checkContactData = async (req, res, next) => {
       .json({ message: `Missing reqiured ${fieldName} field` });
   }
   const { email } = req.body;
-  const contact = Contact.findOne({ email }).select("-password");
+  const contact = await Contact.findOne({ email }).select("-password");
+
   if (contact) res.status(400).json({ message: "Email already exists " });
 
   next();
