@@ -9,7 +9,9 @@ const {
 
 exports.getListContactsController = async (req, res, next) => {
   try {
-    const contacts = await listContacts();
+    const { id } = req.user;
+
+    const contacts = await listContacts(id, req.query);
     res.status(200).json(contacts);
   } catch (err) {
     res.status(500).json({
@@ -33,16 +35,16 @@ exports.getContactByIdController = async (req, res, next) => {
   }
 };
 
-exports.getAddContactByIdController = async (req, res, next) => {
+exports.getAddContactByIdController = async (req, res) => {
   try {
-    const { body } = req;
-
-    const contactAdd = await addContact(body);
-
+    const { body, user } = req;
+    const contactAdd = await addContact(body, user);
+    // console.log("--->", req.user);
+    // console.log("addContact--->", contactAdd);
     res.status(201).json(contactAdd);
   } catch (err) {
     res.status(500).json({
-      msg: err.msg,
+      message: err.message,
     });
   }
 };

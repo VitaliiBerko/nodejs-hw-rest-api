@@ -14,9 +14,11 @@ const {
   checkContactBody,
   checkContactStatus,
 } = require("../../middlewares/contactMiddlewares");
+const { protect } = require("../../middlewares/authMiddlewares");
 
 const router = express.Router();
 
+router.use(protect);
 router
   .route("/")
   .get(getListContactsController)
