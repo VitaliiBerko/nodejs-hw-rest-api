@@ -1,16 +1,17 @@
 const jwt = require("jsonwebtoken");
 const User = require("./userModel");
 
+
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
 const addUser = async (body) => {
   try {
     const newUser = await User.create(body);
-    const { email, subscription } = newUser;
+    const { email, subscription, avatarURL } = newUser;
     newUser.password = undefined;
 
-    return { user: { email, subscription } };
+    return { user: { email, subscription, avatarURL } };
   } catch (err) {
     console.error(err.message);
   }

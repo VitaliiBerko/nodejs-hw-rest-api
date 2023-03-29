@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const { addUser, loginUser, logoutUser } = require("../models/user");
+const ImageService = require("../services/imageService");
 
 exports.registerController = async (req, res) => {
   const { email } = req.body;
@@ -61,7 +62,18 @@ exports.logoutController = async (req, res) => {
 };
 
 exports.currentUserController = (req, res) => {
-  console.log("123", req.user);
   const { email, subscription } = req.user;
   res.status(200).json({ email, subscription });
+};
+
+exports.avatarUploadController = async (req, res) => {
+  const { file, user } = req;
+  if (file) {
+    user.avatarURL = await ImageService.save(file, { width: 300, height: 300 }, "avatars", "users", user.id);
+  }
+  const updadatedUser = user.save();
+
+  // const {avatarURL} = req.user;
+  // if(!avatarURL) return res.status(400).json({message: "Oooops..."})
+  res.status(200).json({ avatarURL: updadatedUser.avatarURL });
 };

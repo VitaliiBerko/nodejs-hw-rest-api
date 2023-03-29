@@ -3,8 +3,6 @@ const Contact = require("../models/contactModel");
 const listContacts = async (id, query) => {
   try {
     const { limit, page = 1, favorite } = query;
-    console.log("favorite---->", favorite);
-
     const findOptions = favorite
       ? { $and: [{ owner: id }, { favorite }] }
       : { owner: id };
@@ -47,7 +45,7 @@ const addContact = async (body, user) => {
     body.owner = user;
 
     const contact = await Contact.create(body);
-   
+
     return contact;
   } catch (err) {
     console.error(err.message);
