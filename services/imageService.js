@@ -23,11 +23,12 @@ class ImageService {
   }
 
   static async save(file, options, ...pathSegments) {
-    const fileName = `${nanoid().jpeg}`;
+    const fileName = `${nanoid()}.jpeg`;
     const fullFilePath = path.join(process.cwd(), "public", ...pathSegments);
 
-    await fse.ensureDir(fullFilePath);
-    await Jimp.read(file, (err, file) => {
+    await fse.ensureDir(fullFilePath);    
+
+    await Jimp.read( file,  (err, file) => {
       if (err) throw err;
       file
         .resize(250, 250) // resize
@@ -35,7 +36,7 @@ class ImageService {
         .greyscale() // set greyscale
         .write(path.join(fullFilePath, fileName)); // save
 
-      return path.join(...pathSegments, fileName);
+      // return path.join(...pathSegments, fileName);
     });
     // public/avatars/users/<id user>/<avata>.jpeg
   }
