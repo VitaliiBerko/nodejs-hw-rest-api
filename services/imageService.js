@@ -22,23 +22,19 @@ class ImageService {
     }).single(name);
   }
 
-  static async save(file, options, ...pathSegments) {
+  static async save(file, ...pathSegments) {
     const fileName = `${nanoid()}.jpeg`;
     const fullFilePath = path.join(process.cwd(), "public", ...pathSegments);
 
-    await fse.ensureDir(fullFilePath);    
+    await fse.ensureDir(fullFilePath);
 
-    await Jimp.read( file,  (err, file) => {
-      if (err) throw err;
-      file
-        .resize(250, 250) // resize
-        .quality(60) // set JPEG quality
-        .greyscale() // set greyscale
-        .write(path.join(fullFilePath, fileName)); // save
+    const avatar = await Jimp.read(file.buffer);
+    await avatar
+      .resize(250, 250)
+      .quality(90)
+      .writeAsync(path.join(fullFilePath, fileName));
 
-      // return path.join(...pathSegments, fileName);
-    });
-    // public/avatars/users/<id user>/<avata>.jpeg
+    return path.join(...pathSegments, fileName);
   }
 }
 

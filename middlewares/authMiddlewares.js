@@ -60,31 +60,6 @@ exports.protect = async (req, res, next) => {
   next();
 };
 
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cbf) => {
-//     cbf(null, "public/avatars");
-//   },
 
-//   filename: (req, file, cbf) => {
-//     const ext = file.mimetype.split("/")[1];
-//     cbf(null, `${nanoid()}.${ext}`);
-//   },
-//   limits: {
-//     fileSize: 1048576,
-//   },
-// });
-
-// const multerFilter = (req, file, cbf, res) => {
-//   if (file.mimetype.startsWith("image")) {
-//     cbf(null, true);
-//   } else {
-//     cbf(res.status(400).json({ message: `Uoload images only` }), false);
-//   }
-// };
-
-// exports.uploadUserAvatar = multer({
-//   storage: multerStorage,
-//   fileFilter: multerFilter,
-// }).single("avatar");
 
 exports.uploadUserAvatar = ImageService.upload("avatar");

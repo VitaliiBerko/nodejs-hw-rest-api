@@ -69,11 +69,13 @@ exports.currentUserController = (req, res) => {
 exports.avatarUploadController = async (req, res) => {
   const { file, user } = req;
   if (file) {
-    user.avatarURL = await ImageService.save(file, { width: 300, height: 300 }, "avatars", "users", user.id);
+    user.avatarURL = await ImageService.save(file, "avatars", "users", user.id);
   }
   const updadatedUser = await user.save();
+  
+  // console.log("--->", updadatedUser.avatarURL);
 
-  // const {avatarURL} = req.user;
-  // if(!avatarURL) return res.status(400).json({message: "Oooops..."})
+
+ 
   res.status(200).json({ avatarURL: updadatedUser.avatarURL });
 };
