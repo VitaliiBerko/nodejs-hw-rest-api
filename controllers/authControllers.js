@@ -71,11 +71,7 @@ exports.avatarUploadController = async (req, res) => {
   if (file) {
     user.avatarURL = await ImageService.save(file, "avatars", "users", user.id);
   }
-  const updadatedUser = await user.save();
-  
-  // console.log("--->", updadatedUser.avatarURL);
-
-
- 
+  const updadatedUser = await user.save();  
+   
   res.status(200).json({ avatarURL: updadatedUser.avatarURL });
 };
