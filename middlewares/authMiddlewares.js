@@ -2,6 +2,8 @@ const Joi = require("joi");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
+const ImageService = require("../services/imageService");
+
 exports.checkRegisterData = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -57,3 +59,7 @@ exports.protect = async (req, res, next) => {
   req.user = currentUser;
   next();
 };
+
+
+
+exports.uploadUserAvatar = ImageService.upload("avatar");
