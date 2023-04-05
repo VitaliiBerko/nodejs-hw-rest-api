@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const { addUser, loginUser, logoutUser } = require("../models/user");
+const { addUser, loginUser, logoutUser, registrationVerification } = require("../models/user");
 const ImageService = require("../services/imageService");
 
 exports.registerController = async (req, res) => {
@@ -75,3 +75,11 @@ exports.avatarUploadController = async (req, res) => {
    
   res.status(200).json({ avatarURL: updadatedUser.avatarURL });
 };
+
+exports.registrationVerificationtionController = async (req, res, next)=> {
+  const {verificationToken} = req.params
+
+  await registrationVerification(verificationToken);
+
+  res.status(200).json({message: 'Verification successful'})
+}
