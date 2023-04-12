@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("./userModel");
 const { nanoid } = require("nanoid");
 const sgMail = require("@sendgrid/mail");
-const AppError = require("../utils/error");
+require("dotenv").config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -12,10 +12,19 @@ const signToken = (id) =>
 const addUser = async (body) => {
   try {
     const verificationToken = nanoid();
-    const newUser = await User.create(body, verificationToken);
+    const newUser = await User.create({ ...body, verificationToken });
     const { email, subscription, avatarURL } = newUser;
-    newUser.password = undefined;   
-    
+    newUser.password = undefined;
+
+    const msg = {
+      to: email,
+      from: "v.berko85@gmail.com",
+      subject: "Thank you for registration!",
+      text: `Please, confirm your email address POST http://localhost:3000/api/users/verify/${verificationToken}`,
+      html: `Please, confirm your email address POST http://localhost:3000/api/users/verify/${verificationToken}`,
+    };
+
+    await sgMail.send(msg);
 
     return { user: { email, subscription, avatarURL } };
   } catch (err) {
@@ -56,33 +65,8 @@ const logoutUser = async (id) => {
   }
 };
 
-const registrationVerification = async (verificationToken) => {
-  const user = await User.findOne({
-    verificationToken,
-    verify: false   
-  });
-    
-  if (!user) {
-    throw new AppError(404, "User not found");
-  }  
-  user.verify = true;
-  await user.save();
-
-  const msg = {
-    to: user.email,
-    from: 'v.berko85@gmail.com',
-    subject: 'Verification successful',
-    text: 'Thank you for registration! Your verification successful.',
-    html: '<p>Thank you for registration! Your verification successful.<p>'
-  };
-
-  await sgMail.send(msg);
-
-};
-
 module.exports = {
   addUser,
   loginUser,
   logoutUser,
-  registrationVerification,
 };

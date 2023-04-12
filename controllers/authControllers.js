@@ -1,6 +1,15 @@
 const User = require("../models/userModel");
-const { addUser, loginUser, logoutUser, registrationVerification } = require("../models/user");
+const {
+  addUser,
+  loginUser,
+  logoutUser,
+ } = require("../models/user");
 const ImageService = require("../services/imageService");
+const AppError = require("../utils/error");
+const sgMail = require("@sendgrid/mail");
+require("dotenv").config();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.registerController = async (req, res) => {
   const { email } = req.body;
@@ -71,15 +80,67 @@ exports.avatarUploadController = async (req, res) => {
   if (file) {
     user.avatarURL = await ImageService.save(file, "avatars", "users", user.id);
   }
-  const updadatedUser = await user.save();  
-   
+  const updadatedUser = await user.save();
+
   res.status(200).json({ avatarURL: updadatedUser.avatarURL });
 };
 
-exports.registrationVerificationtionController = async (req, res, next)=> {
-  const {verificationToken} = req.params
+exports.registrationVerificationtionController = async (req, res, next) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({
+    verificationToken,
+  });
 
-  await registrationVerification(verificationToken);
+  try {
+    if (!user) {
+      return next(new AppError(404, "User not found"));
+    }
 
-  res.status(200).json({message: 'Verification successful'})
-}
+    const msg = {
+      to: user.email,
+      from: "v.berko85@gmail.com",
+      subject: "Verification successful",
+      text: "Thank you for registration! Your verification successful.",
+      html: "<p>Thank you for registration! Your verification successful.<p>",
+    };
+
+    await sgMail.send(msg);
+
+    await User.findByIdAndUpdate(user.id, {
+      verify: true,
+      verificationToken: null,
+    });
+
+    res.status(200).json({ message: "Verification successful" });
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+exports.resendVerificationController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new AppError(404, "User doesn`t exist"));
+    }
+
+    if (user.verify) {
+      return next(new AppError(400, "Verification has already been passed"));
+    }
+
+    const msg = {
+      to: email,
+      from: "v.berko85@gmail.com",
+      subject: "Email verification",
+      text: "Please, confirm your email address.",
+      html: `Please, confirm your email address http://localhost:3000/api/users/verify/${user.verificationToken}`,
+    };
+
+    await sgMail.send(msg);
+
+    res.status(200).json({ message: "Verification email sent" });
+  } catch (err) {
+    console.error(err.message);
+  }
+};
