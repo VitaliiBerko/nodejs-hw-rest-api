@@ -1,15 +1,30 @@
 const jwt = require("jsonwebtoken");
 const User = require("./userModel");
+const { nanoid } = require("nanoid");
+const sgMail = require("@sendgrid/mail");
+require("dotenv").config();
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
 const addUser = async (body) => {
   try {
-    const newUser = await User.create(body);
+    const verificationToken = nanoid();
+    const newUser = await User.create({ ...body, verificationToken });
     const { email, subscription, avatarURL } = newUser;
     newUser.password = undefined;
+
+    const msg = {
+      to: email,
+      from: "v.berko85@gmail.com",
+      subject: "Thank you for registration!",
+      text: `Please, confirm your email address POST http://localhost:3000/api/users/verify/${verificationToken}`,
+      html: `Please, confirm your email address POST http://localhost:3000/api/users/verify/${verificationToken}`,
+    };
+
+    await sgMail.send(msg);
 
     return { user: { email, subscription, avatarURL } };
   } catch (err) {

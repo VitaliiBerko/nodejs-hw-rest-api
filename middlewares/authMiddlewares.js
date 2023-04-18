@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 const ImageService = require("../services/imageService");
+const AppError = require("../utils/error");
 
 exports.checkRegisterData = (req, res, next) => {
   const schema = Joi.object({
@@ -60,6 +61,27 @@ exports.protect = async (req, res, next) => {
   next();
 };
 
-
-
 exports.uploadUserAvatar = ImageService.upload("avatar");
+
+exports.checkEmail = async (req, res, next) => {
+  if (!Object.keys(req.body).includes("email")) {
+    return next(new AppError(400, "Missing required field email"));
+  }
+
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+  });
+
+  const validationErr = schema.validate(req.body).error;
+
+  if (validationErr) {
+    const fieldName = validationErr.details[0].context.key;
+    console.log(validationErr.details[0].message);
+
+    return res
+      .status(400)
+      .json({ message: `Missing reqiured ${fieldName} field.` });
+  }
+
+  next();
+};
